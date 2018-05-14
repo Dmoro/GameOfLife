@@ -58,6 +58,8 @@ function Board (yWidth) {
       }
       this.board[i] = cols;
     }
+
+    this.randPopulate();
   };
 
   this.clearBoard = function() {
@@ -97,6 +99,14 @@ function Board (yWidth) {
       x: evt.clientX - rect.left,
       y: evt.clientY - rect.top
     };
+  }
+
+  this.randPopulate = function() {
+    //set random start cells
+    let startCells = (this.xWidth*this.yWidth)/10;
+    for (let i = 0; i < startCells; i++) {
+      this.setCell(getRandomInt(this.xWidth-1), getRandomInt(this.yWidth-1), 1)
+    }
   }
 
   this.canvas = document.getElementById("myCanvas");
@@ -145,11 +155,7 @@ function Board (yWidth) {
         break;
 
       case "p":
-        //set random start cells
-        let startCells = (self.xWidth*self.yWidth)/10;
-        for (let i = 0; i < startCells; i++) {
-          self.setCell(getRandomInt(self.xWidth-1), getRandomInt(self.yWidth-1), 1)
-        }
+        self.randPopulate();
         break;
 
       default:
