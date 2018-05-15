@@ -1,5 +1,5 @@
 "use strict";
-let game = new Game(1000);
+let game = new Game(100);
 game.run();
 
 function Game (speed) {
