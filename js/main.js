@@ -12,9 +12,11 @@ function Game (speed) {
 
   this.gameOfLifeRules = function(board){
     let nextBoard = new Board(this.canvas.xMax, this.canvas.yMax);
+    let boardXmax = Math.min(board.xMax, nextBoard.xMax);
+    let boardYmax = Math.min(board.yMax, nextBoard.yMax);
 
-    for (let x = 0; x < board.xMax; x++) {
-      for (let y = 0; y < board.yMax; y++) {
+    for (let x = 0; x < boardXmax; x++) {
+      for (let y = 0; y < boardYmax; y++) {
         //game of life
         let neighbors = board.countNeighbors(x, y);
 
@@ -113,7 +115,6 @@ function Board (xMax, yMax) {
 }
 
 function Canvas (yMax) {
-
   let self = this;
 
   this.init = function() {
@@ -162,7 +163,7 @@ function Canvas (yMax) {
   };
 
   this.drawBoard = function(board){
-    //clean squre
+    //clean square
     this.cvs.fillStyle=self.CELL_COLOR;
     this.cvs.fillRect(0, 0, this.cvs.canvas.width, this.cvs.canvas.height);
 
@@ -195,8 +196,8 @@ function Canvas (yMax) {
   this.resizeCanvas = function() {
     game.running = false;
     self.init();
-    self.drawBoard(game.currBoard)
     game.running = true;
+    self.drawBoard(game.currBoard)
   };
 
   window.addEventListener('resize', this.resizeCanvas, false);
