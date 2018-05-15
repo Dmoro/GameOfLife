@@ -113,8 +113,8 @@ function Board (xMax, yMax) {
 }
 
 function Canvas (yMax) {
-  this.clientWidth = Math.min(window.innerWidth, document.documentElement.clientWidth);
-  this.clientHeight = Math.min(window.innerHeight, document.documentElement.clientHeight);
+  this.clientWidth = Math.max(window.innerWidth, document.documentElement.clientWidth);
+  this.clientHeight = Math.max(window.innerHeight, document.documentElement.clientHeight);
 
   this.NUM_BUTTONS = 3;
   this.BUTTON_HEIGHT = this.clientHeight * 0.1;
@@ -186,6 +186,17 @@ function Canvas (yMax) {
       y: evt.changedTouches[0].clientY - rect.top
     };
   };
+
+
+  this.resizeCanvas = function() {
+    this.canvas.width = this.clientHeight - this.BUTTON_HEIGHT - 2;
+    this.canvas.height = this.clientWidth - 20;
+    this.drawBoard(game.currBoard)
+  };
+
+  window.addEventListener('resize', this.resizeCanvas, false);
+  window.addEventListener('orientationchange', this.resizeCanvas, false);
+
 
   //Handle mouse events
   this.canvas.addEventListener('mousemove', function(evt) {
