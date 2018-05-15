@@ -1,13 +1,17 @@
+"use strict";
+
 let running = true;
+let speed = 100;
 run();
 
 async function run() {
-  let board = new Board(40);
+  let board = new Board(50);
   board.drawCanvas();
 
   //Keep running
+  // noinspection InfiniteLoopJS
   for (let turns = 0; ; turns++) {
-    await sleep(100);
+    await sleep(speed);
     if (running) {
       console.log(turns);
       for (let x = 0; x < board.xWidth; x++) {
@@ -15,11 +19,11 @@ async function run() {
           //game of life
           let neighbors = countNeighbors(board, x, y);
           //kill lonely or overcrowded cells
-          if (board.getCell(x, y) === 1 && (neighbors < 2 || neighbors > 3)) {
+          if (neighbors < 2 || neighbors > 3) {
             board.setCell(x, y, 0);
           }
           //create new cells
-          else if (board.getCell(x, y) === 0 && neighbors === 3) {
+          else if (neighbors === 3) {
             board.setCell(x, y, 1);
           }
         }
@@ -33,7 +37,7 @@ function getRandomInt(max) {
 }
 
 function countNeighbors(board, x, y){
-  let totalCount = 0
+  let totalCount = 0;
   totalCount += x>0 && y>0 ?  board.getCell(x-1, y-1) : 0; //topleft
   totalCount += y>0 ?  board.getCell(x, y-1) : 0; //top
   totalCount += x<(board.xWidth-1) && y>0 ?  board.getCell(x+1, y-1) : 0; //topRight
@@ -68,7 +72,7 @@ function Board (yWidth) {
         this.setCell(x,y,0);
       }
     }
-  }
+  };
 
   this.getCell = function (x, y) {
     return this.board[x][y];
@@ -80,13 +84,18 @@ function Board (yWidth) {
   };
 
   this.drawCell = function(x, y, val){
-    if(val === 1) this.cvs.fillStyle="#ff0008";
-    else this.cvs.fillStyle="#000000";
+    //draw surrounding white square
+    this.cvs.fillStyle="#ffffff";
+    this.cvs.fillRect((x * this.cellWidth), (y * this.cellHeight ), this.cellWidth, this.cellHeight);
+
+    //draw cell
+    if(val === 1) this.cvs.fillStyle="#000000";
+    else if (val === 0) this.cvs.fillStyle="#ffffff";
     this.cvs.fillRect((x * this.cellWidth) + 1, (y * this.cellHeight ) + 1, this.cellWidth - 2, this.cellHeight - 2);
   };
 
   this.drawCanvas = function(){
-   for(let i = 0; i < this.xWidth; i++) {
+    for(let i = 0; i < this.xWidth; i++) {
       for(let j = 0; j < this.yWidth; j++) {
         this.drawCell(i, j, this.getCell(i,j))
       }
@@ -99,7 +108,7 @@ function Board (yWidth) {
       x: evt.clientX - rect.left,
       y: evt.clientY - rect.top
     };
-  }
+  };
 
   this.randPopulate = function() {
     //set random start cells
@@ -107,7 +116,7 @@ function Board (yWidth) {
     for (let i = 0; i < startCells; i++) {
       this.setCell(getRandomInt(this.xWidth-1), getRandomInt(this.yWidth-1), 1)
     }
-  }
+  };
 
   this.canvas = document.getElementById("myCanvas");
   this.cvs = this.canvas.getContext("2d");
@@ -134,20 +143,19 @@ function Board (yWidth) {
 
   this.canvas.onmousedown = function(e) {
     self.mouseDown = true;
-    running = false;
+    //running = false;
     console.log("mouse down");
   };
   this.canvas.onmouseup = function(e) {
     self.mouseDown = false;
-    running = true;
+    //running = true;
     console.log("mouse up");
   };
 
   document.body.onkeyup = function(e){
     switch(e.key){
       case " ":
-        if(running) running = false;
-        else running = true;
+        running = !running;
         break;
 
       case "c":
@@ -156,6 +164,14 @@ function Board (yWidth) {
 
       case "p":
         self.randPopulate();
+        break;
+
+      case "ArrowLeft":
+        speed += 100;
+        break;
+
+      case "ArrowRight":
+        speed -= 100;
         break;
 
       default:
