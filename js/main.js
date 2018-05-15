@@ -117,7 +117,7 @@ function Canvas (yMax) {
   this.clientHeight = Math.max(window.innerHeight, document.documentElement.clientHeight);
 
   this.NUM_BUTTONS = 3;
-  this.BUTTON_HEIGHT = this.clientHeight * 0.1;
+  this.BUTTON_HEIGHT = this.clientHeight * 0.05;
   this.BUTTON_WIDTH = (this.clientWidth-100) / this.NUM_BUTTONS;
   this.CELL_COLOR = "#000000";
   this.BACK_COLOR = "#ffffff";
@@ -186,16 +186,6 @@ function Canvas (yMax) {
       y: evt.changedTouches[0].clientY - rect.top
     };
   };
-
-
-  this.resizeCanvas = function() {
-    this.canvas.width = this.clientHeight - this.BUTTON_HEIGHT - 2;
-    this.canvas.height = this.clientWidth - 20;
-    this.drawBoard(game.currBoard)
-  };
-
-  window.addEventListener('resize', this.resizeCanvas, false);
-  window.addEventListener('orientationchange', this.resizeCanvas, false);
 
 
   //Handle mouse events
