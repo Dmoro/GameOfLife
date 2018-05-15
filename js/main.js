@@ -113,12 +113,19 @@ function Board (xMax, yMax) {
 }
 
 function Canvas (yMax) {
+  this.NUM_BUTTONS = 3;
+  this.BUTTON_HEIGHT = window.innerHeight * 0.1;
+  this.BUTTON_WIDTH = (window.innerWidth-100) / this.NUM_BUTTONS;
+  this.CELL_COLOR = "#000000";
+  this.BACK_COLOR = "#ffffff";
+  this.BORDER_WIDTH = 1;
+
   this.canvas = document.getElementById("myCanvas");
   this.playButton = document.getElementById("playButton");
   this.resetButton = document.getElementById("resetButton");
   this.populateButton = document.getElementById("populateButton");
   this.cvs = this.canvas.getContext("2d");
-  this.cvs.canvas.height = window.innerHeight - 20;
+  this.cvs.canvas.height = window.innerHeight - this.BUTTON_HEIGHT - 20;
   this.cvs.canvas.width = window.innerWidth - 20;
   this.yMax = yMax;
   this.cellHeight = this.cvs.canvas.height / this.yMax;
@@ -126,18 +133,31 @@ function Canvas (yMax) {
   this.xMax = Math.trunc(this.cvs.canvas.width / this.cellWidth);
   let self = this;
 
-  this.drawCell = function(x, y, val){
-    //draw surrounding white square
-    this.cvs.fillStyle="#ffffff";
+  //make buttons pretty
+
+  this.playButton.style = `height:${this.BUTTON_HEIGHT}px;width:${this.BUTTON_WIDTH}px`;
+  this.resetButton.style = `height:${this.BUTTON_HEIGHT}px;width:${this.BUTTON_WIDTH}px`;
+  this.populateButton.style = `height:${this.BUTTON_HEIGHT}px;width:${this.BUTTON_WIDTH}px`;
+
+    this.drawCell = function(x, y, val){
+    //draw surrounding square
+    this.cvs.fillStyle=self.CELL_COLOR;
     this.cvs.fillRect((x * this.cellWidth), (y * this.cellHeight ), this.cellWidth, this.cellHeight);
 
     //draw cell
-    if(val === 1) this.cvs.fillStyle="#000000";
-    else if (val === 0) this.cvs.fillStyle="#ffffff";
-    this.cvs.fillRect((x * this.cellWidth) + 1, (y * this.cellHeight ) + 1, this.cellWidth - 2, this.cellHeight - 2);
+    if(val === 1) {
+      this.cvs.fillStyle=self.BACK_COLOR;
+      this.cvs.fillRect((x * this.cellWidth) + self.BORDER_WIDTH, (y * this.cellHeight ) + self.BORDER_WIDTH,
+                        this.cellWidth - (2* self.BORDER_WIDTH), this.cellHeight - (2* self.BORDER_WIDTH));
+    }
+
   };
 
   this.drawBoard = function(board){
+    //clean squre
+    this.cvs.fillStyle=self.CELL_COLOR;
+    this.cvs.fillRect(0, 0, this.cvs.canvas.width, this.cvs.canvas.height);
+
     for(let i = 0; i < board.xMax; i++) {
       for(let j = 0; j < board.yMax; j++) {
         this.drawCell(i, j, board.getCell(i,j))
@@ -186,24 +206,16 @@ function Canvas (yMax) {
 
   this.canvas.onmousedown = function(e) {
     self.mouseDown = true;
-    //running = false;
-    console.log("mouse down");
   };
   this.canvas.onmouseup = function(e) {
     self.mouseDown = false;
-    //running = true;
-    console.log("mouse up");
   };
 
   this.canvas.ontouchstart = function(e) {
     self.touchDown = true;
-    //running = false;
-    console.log("touch down");
   };
   this.canvas.ontouchend = function(e) {
     self.touchDown = false;
-    //running = true;
-    console.log("touch up");
   };
 
   this.playButton.onclick = function(){
