@@ -46,7 +46,7 @@ function Game (speed) {
       let oldTime = new Date().getTime();
       while((oldTime + this.speed) >  new Date().getTime()) { await sleep(1); }
       let dif = new Date().getTime() - (oldTime + this.speed);
-      console.log(`Running ${dif} ms late`)
+      //console.log(`Running ${dif} ms late`)
 
       //await sleep(this.speed);
       //this.canvas.drawBoard(this.currBoard); Much slower
@@ -114,6 +114,9 @@ function Board (xMax, yMax) {
 
 function Canvas (yMax) {
   this.canvas = document.getElementById("myCanvas");
+  this.playButton = document.getElementById("playButton");
+  this.resetButton = document.getElementById("resetButton");
+  this.populateButton = document.getElementById("populateButton");
   this.cvs = this.canvas.getContext("2d");
   this.cvs.canvas.height = window.innerHeight - 20;
   this.cvs.canvas.width = window.innerWidth - 20;
@@ -150,12 +153,32 @@ function Canvas (yMax) {
     };
   };
 
+  this.getTouchPos = function (evt) {
+    if (evt.touches.length > 1) return;
+
+    let rect = this.canvas.getBoundingClientRect();
+    return {
+      x: evt.changedTouches[0].clientX - rect.left,
+      y: evt.changedTouches[0].clientY - rect.top
+    };
+  };
+
   //Handle mouse events
   this.canvas.addEventListener('mousemove', function(evt) {
     if(self.mouseDown){
       let mousePos = self.getMousePos(evt);
       let xCell = Math.trunc(mousePos.x / self.cellWidth);
       let yCell = Math.trunc(mousePos.y / self.cellHeight);
+      game.currBoard.setCell(xCell, yCell, 1);
+      self.drawCell(xCell, yCell, 1);
+    }
+  }, false);
+
+  this.canvas.addEventListener('touchmove', function(evt) {
+    if(self.touchDown){
+      let touchPos = self.getTouchPos(evt);
+      let xCell = Math.trunc(touchPos.x / self.cellWidth);
+      let yCell = Math.trunc(touchPos.y / self.cellHeight);
       game.currBoard.setCell(xCell, yCell, 1);
       self.drawCell(xCell, yCell, 1);
     }
@@ -170,6 +193,37 @@ function Canvas (yMax) {
     self.mouseDown = false;
     //running = true;
     console.log("mouse up");
+  };
+
+  this.canvas.ontouchstart = function(e) {
+    self.touchDown = true;
+    //running = false;
+    console.log("touch down");
+  };
+  this.canvas.ontouchend = function(e) {
+    self.touchDown = false;
+    //running = true;
+    console.log("touch up");
+  };
+
+  this.playButton.onclick = function(){
+    if(game.running) {
+      game.running = false;
+      self.playButton.value = "Play"
+    } else {
+      game.running = true;
+      self.playButton.value = "Pause"
+    }
+  };
+
+  this.resetButton.onclick = function(){
+    game.currBoard.clearBoard();
+    self.drawBoard(game.currBoard);
+  };
+
+  this.populateButton.onclick = function(){
+    game.currBoard.randPopulate();
+    self.drawBoard(game.currBoard);
   };
 
   document.body.onkeyup = function(e){
