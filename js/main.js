@@ -113,37 +113,41 @@ function Board (xMax, yMax) {
 }
 
 function Canvas (yMax) {
-  this.clientWidth = Math.max(window.innerWidth, document.documentElement.clientWidth);
-  this.clientHeight = Math.max(window.innerHeight, document.documentElement.clientHeight);
 
-  this.NUM_BUTTONS = 3;
-  this.BUTTON_HEIGHT = this.clientHeight * 0.05;
-  this.BUTTON_WIDTH = (this.clientWidth-100) / this.NUM_BUTTONS;
-  this.CELL_COLOR = "#000000";
-  this.BACK_COLOR = "#ffffff";
-  this.BORDER_WIDTH = 1;
-
-  this.canvas = document.getElementById("myCanvas");
-  this.playButton = document.getElementById("playButton");
-  this.resetButton = document.getElementById("resetButton");
-  this.populateButton = document.getElementById("populateButton");
-  this.cvs = this.canvas.getContext("2d");
-
-  this.cvs.canvas.height = this.clientHeight - this.BUTTON_HEIGHT - 20;
-  this.cvs.canvas.width = this.clientWidth - 20;
-  this.yMax = yMax;
-  this.cellHeight = this.cvs.canvas.height / this.yMax;
-  this.cellWidth = this.cellHeight;
-  this.xMax = Math.trunc(this.cvs.canvas.width / this.cellWidth);
   let self = this;
 
-  //make buttons pretty
+  this.init = function() {
+    this.clientWidth = Math.max(window.innerWidth, document.documentElement.clientWidth);
+    this.clientHeight = Math.max(window.innerHeight, document.documentElement.clientHeight);
+    this.NUM_BUTTONS = 3;
+    this.BUTTON_HEIGHT = this.clientHeight * 0.05;
+    this.BUTTON_WIDTH = (this.clientWidth - 100) / this.NUM_BUTTONS;
+    this.CELL_COLOR = "#000000";
+    this.BACK_COLOR = "#ffffff";
+    this.BORDER_WIDTH = 1;
 
-  this.playButton.style = `height:${this.BUTTON_HEIGHT}px;width:${this.BUTTON_WIDTH}px`;
-  this.resetButton.style = `height:${this.BUTTON_HEIGHT}px;width:${this.BUTTON_WIDTH}px`;
-  this.populateButton.style = `height:${this.BUTTON_HEIGHT}px;width:${this.BUTTON_WIDTH}px`;
+    this.canvas = document.getElementById("myCanvas");
+    this.playButton = document.getElementById("playButton");
+    this.resetButton = document.getElementById("resetButton");
+    this.populateButton = document.getElementById("populateButton");
+    this.cvs = this.canvas.getContext("2d");
 
-    this.drawCell = function(x, y, val){
+    this.cvs.canvas.height = this.clientHeight - this.BUTTON_HEIGHT - 20;
+    this.cvs.canvas.width = this.clientWidth - 20;
+    this.yMax = yMax;
+    this.cellHeight = this.cvs.canvas.height / this.yMax;
+    this.cellWidth = this.cellHeight;
+    this.xMax = Math.trunc(this.cvs.canvas.width / this.cellWidth);
+
+    //make buttons pretty
+    this.playButton.style = `height:${this.BUTTON_HEIGHT}px;width:${this.BUTTON_WIDTH}px`;
+    this.resetButton.style = `height:${this.BUTTON_HEIGHT}px;width:${this.BUTTON_WIDTH}px`;
+    this.populateButton.style = `height:${this.BUTTON_HEIGHT}px;width:${this.BUTTON_WIDTH}px`;
+  };
+  self.init();
+
+
+  this.drawCell = function(x, y, val){
     //draw surrounding square
     this.cvs.fillStyle=self.CELL_COLOR;
     this.cvs.fillRect((x * this.cellWidth), (y * this.cellHeight ), this.cellWidth, this.cellHeight);
@@ -186,6 +190,17 @@ function Canvas (yMax) {
       y: evt.changedTouches[0].clientY - rect.top
     };
   };
+
+
+  this.resizeCanvas = function() {
+    game.running = false;
+    self.init();
+    self.drawBoard(game.currBoard)
+    game.running = true;
+  };
+
+  window.addEventListener('resize', this.resizeCanvas, false);
+  window.addEventListener('orientationchange', this.resizeCanvas, false);
 
 
   //Handle mouse events
@@ -234,13 +249,17 @@ function Canvas (yMax) {
   };
 
   this.resetButton.onclick = function(){
+    game.running = false;
     game.currBoard.clearBoard();
     self.drawBoard(game.currBoard);
+    game.running = true;
   };
 
   this.populateButton.onclick = function(){
+    game.running = false;
     game.currBoard.randPopulate();
     self.drawBoard(game.currBoard);
+    game.running = true;
   };
 
   document.body.onkeyup = function(e){
