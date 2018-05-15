@@ -1,5 +1,5 @@
 "use strict";
-let game = new Game(100);
+let game = new Game(1000);
 game.run();
 
 function Game (speed) {
@@ -40,10 +40,16 @@ function Game (speed) {
     //Keep running
     // noinspection InfiniteLoopJS
     for (let turns = 0; ; turns++) {
-      await sleep(this.speed);
+      //get correct time
+      let oldTime = new Date().getTime();
+      while((oldTime + this.speed) >  new Date().getTime()) { await sleep(1); }
+      let dif = new Date().getTime() - (oldTime + this.speed);
+      console.log(`Running ${dif} ms late`)
+
+      //await sleep(this.speed);
       this.canvas.drawBoard(this.currBoard);
       if (this.running) {
-        console.log(turns);
+        //console.log(turns);
         this.currBoard = this.gameOfLifeRules(this.currBoard);
       }
     }
