@@ -5,7 +5,7 @@ game.run();
 function Game (speed) {
   this.speed = speed;
   this.running = true;
-  this.canvas = new Canvas(50);
+  this.canvas = new Canvas(100);
   this.currBoard = new Board(this.canvas.xMax, this.canvas.yMax);
   this.currBoard.randPopulate();
   this.canvas.drawBoard(this.currBoard);
@@ -21,12 +21,14 @@ function Game (speed) {
         if(board.getCell(x,y) === 1) { //live cell
           if (neighbors < 2 || neighbors > 3) { //kill lonely or overcrowded cells
             nextBoard.setCell(x, y, 0);
+            this.canvas.drawCell(x,y, 0);
           } else {
             nextBoard.setCell(x, y, 1);
           }
         } else if (board.getCell(x,y) === 0) { //dead cell
           if (neighbors === 3) { //create new cells
             nextBoard.setCell(x, y, 1);
+            this.canvas.drawCell(x,y, 1);
           }
         }
 
@@ -47,7 +49,7 @@ function Game (speed) {
       console.log(`Running ${dif} ms late`)
 
       //await sleep(this.speed);
-      this.canvas.drawBoard(this.currBoard);
+      //this.canvas.drawBoard(this.currBoard); Much slower
       if (this.running) {
         //console.log(turns);
         this.currBoard = this.gameOfLifeRules(this.currBoard);
@@ -155,6 +157,7 @@ function Canvas (yMax) {
       let xCell = Math.trunc(mousePos.x / self.cellWidth);
       let yCell = Math.trunc(mousePos.y / self.cellHeight);
       game.currBoard.setCell(xCell, yCell, 1);
+      self.drawCell(xCell, yCell, 1);
     }
   }, false);
 
@@ -177,10 +180,12 @@ function Canvas (yMax) {
 
       case "c":
         game.currBoard.clearBoard();
+        self.drawBoard(game.currBoard);
         break;
 
       case "p":
         game.currBoard.randPopulate();
+        self.drawBoard(game.currBoard);
         break;
 
       case "ArrowLeft":
