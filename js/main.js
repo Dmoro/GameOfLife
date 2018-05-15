@@ -113,9 +113,12 @@ function Board (xMax, yMax) {
 }
 
 function Canvas (yMax) {
+  this.clientWidth = Math.min(window.innerWidth, document.documentElement.clientWidth);
+  this.clientHeight = Math.min(window.innerHeight, document.documentElement.clientHeight);
+
   this.NUM_BUTTONS = 3;
-  this.BUTTON_HEIGHT = window.innerHeight * 0.1;
-  this.BUTTON_WIDTH = (window.innerWidth-100) / this.NUM_BUTTONS;
+  this.BUTTON_HEIGHT = this.clientHeight * 0.1;
+  this.BUTTON_WIDTH = (this.clientWidth-100) / this.NUM_BUTTONS;
   this.CELL_COLOR = "#000000";
   this.BACK_COLOR = "#ffffff";
   this.BORDER_WIDTH = 1;
@@ -125,8 +128,9 @@ function Canvas (yMax) {
   this.resetButton = document.getElementById("resetButton");
   this.populateButton = document.getElementById("populateButton");
   this.cvs = this.canvas.getContext("2d");
-  this.cvs.canvas.height = window.innerHeight - this.BUTTON_HEIGHT - 20;
-  this.cvs.canvas.width = window.innerWidth - 20;
+
+  this.cvs.canvas.height = this.clientHeight - this.BUTTON_HEIGHT - 20;
+  this.cvs.canvas.width = this.clientWidth - 20;
   this.yMax = yMax;
   this.cellHeight = this.cvs.canvas.height / this.yMax;
   this.cellWidth = this.cellHeight;
