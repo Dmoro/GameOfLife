@@ -6,24 +6,34 @@ function Game (speed) {
   this.speed = speed;
   this.running = true;
   this.canvas = new Canvas(50);
-  this.board = new Board(this.canvas.xMax, this.canvas.yMax);
-  this.canvas.drawBoard(this.board);
+  this.currBoard = new Board(this.canvas.xMax, this.canvas.yMax);
+  this.currBoard.randPopulate();
+  this.canvas.drawBoard(this.currBoard);
 
   this.gameOfLifeRules = function(board){
+    let nextBoard = new Board(this.canvas.xMax, this.canvas.yMax);
+
     for (let x = 0; x < board.xMax; x++) {
       for (let y = 0; y < board.yMax; y++) {
         //game of life
         let neighbors = board.countNeighbors(x, y);
-        //kill lonely or overcrowded cells
-        if (neighbors < 2 || neighbors > 3) {
-          board.setCell(x, y, 0);
+
+        if(board.getCell(x,y) === 1) { //live cell
+          if (neighbors < 2 || neighbors > 3) { //kill lonely or overcrowded cells
+            nextBoard.setCell(x, y, 0);
+          } else {
+            nextBoard.setCell(x, y, 1);
+          }
+        } else if (board.getCell(x,y) === 0) { //dead cell
+          if (neighbors === 3) { //create new cells
+            nextBoard.setCell(x, y, 1);
+          }
         }
-        //create new cells
-        else if (neighbors === 3) {
-          board.setCell(x, y, 1);
-        }
+
       }
     }
+
+    return nextBoard;
   };
 
   this.run = async function(){
@@ -31,10 +41,10 @@ function Game (speed) {
     // noinspection InfiniteLoopJS
     for (let turns = 0; ; turns++) {
       await sleep(this.speed);
-      this.canvas.drawBoard(this.board);
+      this.canvas.drawBoard(this.currBoard);
       if (this.running) {
         console.log(turns);
-        this.gameOfLifeRules(this.board);
+        this.currBoard = this.gameOfLifeRules(this.currBoard);
       }
     }
   };
@@ -49,8 +59,6 @@ function Board (xMax, yMax) {
       }
       this.board[i] = cols;
     }
-
-    this.randPopulate();
   };
 
   this.clearBoard = function() {
@@ -140,7 +148,7 @@ function Canvas (yMax) {
       let mousePos = self.getMousePos(evt);
       let xCell = Math.trunc(mousePos.x / self.cellWidth);
       let yCell = Math.trunc(mousePos.y / self.cellHeight);
-      game.board.setCell(xCell, yCell, 1);
+      game.currBoard.setCell(xCell, yCell, 1);
     }
   }, false);
 
@@ -162,19 +170,21 @@ function Canvas (yMax) {
         break;
 
       case "c":
-        game.board.clearBoard();
+        game.currBoard.clearBoard();
         break;
 
       case "p":
-        game.board.randPopulate();
+        game.currBoard.randPopulate();
         break;
 
       case "ArrowLeft":
-        game.speed += 100;
+        game.speed += (game.speed / 2);
+        console.log("Speed: " + game.speed);
         break;
 
       case "ArrowRight":
-        game.speed -= 100;
+        game.speed -= (game.speed / 2);
+        console.log("Speed: " + game.speed);
         break;
 
       default:
